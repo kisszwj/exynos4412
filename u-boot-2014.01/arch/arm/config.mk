@@ -5,7 +5,9 @@
 # SPDX-License-Identifier:	GPL-2.0+
 #
 
-CROSS_COMPILE ?= arm-linux-
+#CROSS_COMPILE ?= arm-linux-
+#CROSS_COMPILE ?= /opt/4.4.3/bin/arm-linux-
+CROSS_COMPILE ?= /opt/arm-2009q3/bin/arm-none-linux-gnueabi-
 
 ifndef CONFIG_STANDALONE_LOAD_ADDR
 ifneq ($(CONFIG_OMAP_COMMON),)
