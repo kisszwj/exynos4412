@@ -379,10 +379,13 @@ $(obj)u-boot.hex:	$(obj)u-boot
 $(obj)u-boot.srec:	$(obj)u-boot
 		$(OBJCOPY) ${OBJCFLAGS} -O srec $< $@
 
-$(obj)u-boot.bin:	$(obj)u-boot
+$(obj)u-boot.bin:	$(obj)u-boot $(obj)mkbl2
 		$(OBJCOPY) ${OBJCFLAGS} -O binary $< $@
 		$(call DO_STATIC_RELA,$<,$@,$(CONFIG_SYS_TEXT_BASE))
 		$(BOARD_SIZE_CHECK)
+ifeq ($(CONFIG_EXYNOS4412),y)
+		./mkbl2 u-boot.bin bl2.bin 14336
+endif	
 
 $(obj)u-boot.ldr:	$(obj)u-boot
 		$(CREATE_LDR_ENV)
@@ -395,6 +398,9 @@ $(obj)u-boot.ldr.hex:	$(obj)u-boot.ldr
 $(obj)u-boot.ldr.srec:	$(obj)u-boot.ldr
 		$(OBJCOPY) ${OBJCFLAGS} -O srec $< $@ -I binary
 
+$(obj)mkbl2: sd_fuse
+		$(MAKE) -C sd_fuse/
+		@cp sd_fuse/$@ .
 #
 # U-Boot entry point, needed for booting of full-blown U-Boot
 # from the SPL U-Boot version.
@@ -819,6 +825,10 @@ clean:
 		-o -name '*.o'	-o -name '*.a' -o -name '*.exe' \
 		-o -name '*.cfgtmp' \) -print \
 		| xargs rm -f
+ifeq ($(CONFIG_EXYNOS4412),y)
+		@rm bl2.bin mkbl2
+		@make -C sd_fuse/ clean
+endif
 
 # Removes everything not needed for testing u-boot
 tidy:	clean
